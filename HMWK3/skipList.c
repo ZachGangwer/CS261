@@ -67,8 +67,8 @@ Internal Functions
  ************************************************************************ */
 
 /* Coin toss function:
- param: 	no parameters
- pre:	no parameres
+ param: no parameters
+ pre: no parameres
  post: output is a random intiger number in {0,1} */
 int flipSkipLink(void) {
     return rand() % 2;
@@ -164,20 +164,29 @@ void removeSkipList(struct skipList *slst, TYPE e) {
     }
 }
 
+int sl_search(struct skipLink *currNode, TYPE e) {
+    while (currNode->next != NULL) {
+        if (currNode->next->value > e) {
+        }
+    }
+}
+
 /* *** TODO: Add *** */
 /* Add a new element to the skip list:
-        param: slst -- pointer to the skip list
-        param: e -- element to be added
-        pre:	slst is not null
-        post:	the new element is added to the lowest list and randomly to
-   higher-level lists */
+ * param: slst -- pointer to the skip list
+ * param: e -- element to be added
+ * pre: slst is not null
+ * post: e is added to the lowest list and randomly to higher-level lists
+ */
 void addSkipList(struct skipList *slst, TYPE e) {
-    /* FIXME */
+    assert(slst != NULL);
+    struct skipLink *currNode = slst->topSentinel;
+    sl_search(currNode, e);
 }
 
 /* Find the number of elements in the skip list:
  param: slst -- pointer to the skip list
- pre:	slst is not null
+ pre: slst is not null
  post: the number of elements */
 int sizeSkipList(struct skipList *slst) {
     return slst->size;
@@ -185,20 +194,33 @@ int sizeSkipList(struct skipList *slst) {
 
 /* *** TODO: Print *** */
 /* Print the links in the skip list:
-        param: slst -- pointer to the skip list
-        pre:	slst is not null and slst is not empty
-        post: the links in the skip list are printed breadth-first, top-down */
+ * param: slst -- pointer to the skip list
+ * pre: slst is not null and slst is not empty
+ * post: the links in the skip list are printed breadth-first, top-down
+ */
 void printSkipList(struct skipList *slst) {
     /* FIXME*/
 }
 
-/*
-    Merge two skip lists, by adding elements of skip list 2 to skip list 1 that
-    are not already contained in skip list 1. The function is also supposed to
-    remove the entire skip list 2 from the memory. * param: slst1 -- pointer to
-    the skip list 1. * param: slst2 -- pointer to the skip list 2. * pre: slst1
-    and slst2 are not null, and skip list 1 and skip list 2 are not empty. *
-    post: slst1 points to the merger skip list, slst2 is null.
+struct skipLink *sl_asList(struct skipLink *node) {
+    while (node->down != NULL) {
+        node = node->down;
+    }
+    return node;
+}
+
+/* Merge two skip lists:
+ * param: slst1 -- pointer to the skip list 1.
+ * param: slst2 -- pointer to the skip list 2.
+ * pre: slst1 and slst2 != null, and skip list 1 and skip list 2 are not
+ * post: slst1 points to the merger skip list, slst2 is null.
  */
 void mergeSkipList(struct skipList *slst1, struct skipList *slst2) {
+    assert((slst1 != NULL) && (slst2 != NULL));
+    struct skipLink *currNode = sl_asList(slst2->topSentinel);
+
+    while (currNode->next != NULL) {
+        addSkipList(slst1, currNode->value);
+        currNode = currNode->next;
+    }
 } /* end of the function */
