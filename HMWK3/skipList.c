@@ -164,11 +164,21 @@ void removeSkipList(struct skipList *slst, TYPE e) {
     }
 }
 
-int sl_search(struct skipLink *currNode, TYPE e) {
-    while (currNode->next != NULL) {
-        if (currNode->next->value > e) {
-        }
+int recurseSkipList(struct skipLink *currNode, TYPE e, int depth) {
+    while (currNode->next->value <= e) {
+        currNode = currNode->next;
     }
+
+    if (currNode->down != NULL) {
+        recurseSkipList(currNode->down, e, depth);
+    }
+
+    if (depth >= 1) {
+        skipLinkAdd(currNode, e);
+        depth -= 1;
+    }
+
+    return depth;
 }
 
 /* *** TODO: Add *** */
@@ -181,7 +191,13 @@ int sl_search(struct skipLink *currNode, TYPE e) {
 void addSkipList(struct skipList *slst, TYPE e) {
     assert(slst != NULL);
     struct skipLink *currNode = slst->topSentinel;
-    sl_search(currNode, e);
+    int depth = 1;
+
+    while (flipSkipLink()) {
+        depth += 1;
+    }
+
+    recurseSkipList(currNode, e, depth);
 }
 
 /* Find the number of elements in the skip list:
@@ -192,6 +208,41 @@ int sizeSkipList(struct skipList *slst) {
     return slst->size;
 }
 
+struct skipLink *linkedList(struct skipLink *node) {
+    while (node->down != NULL) {
+        node = node->down;
+    }
+    return node;
+}
+
+TYPE maxSkipList(struct skipLink *list) {
+    TYPE max = 0;
+    while (list != NULL) {
+        if (max < list->value) {
+            max = list->value;
+        }
+        list = list->next;
+    }
+
+    return max;
+}
+
+int widthType(TYPE num) {
+    int width = 1;
+    while (num / 10 > 0) {
+        width += 1;
+    }
+
+    return width;
+}
+
+void printSep(int max, int modifier) {
+    int i, count = max - modifier;
+    for (i = 0; i < count; i++) {
+        printf("%s", "-");
+    }
+}
+
 /* *** TODO: Print *** */
 /* Print the links in the skip list:
  * param: slst -- pointer to the skip list
@@ -199,14 +250,27 @@ int sizeSkipList(struct skipList *slst) {
  * post: the links in the skip list are printed breadth-first, top-down
  */
 void printSkipList(struct skipList *slst) {
-    /* FIXME*/
-}
+    assert(slst != NULL && slst->size > 0);
+    struct skipLink *firstNode = slst->topSentinel;
+    struct skipLink *currNode = firstNode;
+    TYPE max = maxSkipList(linkedList(firstNode));
+    int maxWidth = 2 + widthType(max);
+    int currWidth;
 
-struct skipLink *sl_asList(struct skipLink *node) {
-    while (node->down != NULL) {
-        node = node->down;
+    while (firstNode != NULL) {
+        printf("%s", "|");
+        currWidth = 1;
+        printSep(maxWidth, currWidth);
+        while (currNode != NULL) {
+            printf("%f", currNode->value);
+            currWidth = widthType(currNode->value);
+            printSep(max, currWidth);
+            currNode = currNode->next;
+        }
+        firstNode = firstNode->down;
     }
-    return node;
+
+    return;
 }
 
 /* Merge two skip lists:
@@ -217,7 +281,7 @@ struct skipLink *sl_asList(struct skipLink *node) {
  */
 void mergeSkipList(struct skipList *slst1, struct skipList *slst2) {
     assert((slst1 != NULL) && (slst2 != NULL));
-    struct skipLink *currNode = sl_asList(slst2->topSentinel);
+    struct skipLink *currNode = linkedList(slst2->topSentinel);
 
     while (currNode->next != NULL) {
         addSkipList(slst1, currNode->value);
