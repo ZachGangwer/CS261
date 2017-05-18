@@ -7,13 +7,19 @@
 /* ************************************************************************
 Main Function
  ************************************************************************ */
-/* Test function:
- param: no parameters
- pre:	no parameres
- post: prints out the contents of the skip list */
+int main(int argc, char const *argv[]) {
+    test();
+    return 0;
+}
 
+/* TEST
+ * Test function
+ * no parameters
+ * PRE:     no parameres
+ * POST:    prints out the contents of the skip list
+ */
 void test() {
-    int i, j;
+    /* int i, j; */
     int M;
     struct skipList *slst;
     test();
@@ -25,11 +31,13 @@ void test() {
 
     /*  Initialize the skip list */
 
-    /*  FIXME */
+    initSkipList(slst);
 
     /*  Add to the skip list  M = 20 random integers in [0,100] */
 
-    /*  FIXME */
+    for (M = 0; M < 20; M++) {
+        addSkipList(slst, rand() % 101);
+    }
 
     /*  Print out the contents of the skip list in the breadth-first order,
         starting from top.
@@ -44,11 +52,11 @@ void test() {
         3 7 9 14 20
      */
 
-    /*  FIXME */
+    printSkipList(slst);
 
     /* Develop 3 test cases for printing out the contents of skip list
-       after remove function:
-             int removeSkipList(struct skipList *slst, TYPE e)
+     * after remove function:
+            int removeSkipList(struct skipList *slst, TYPE e)
      */
 
     /*  FIXME */
@@ -66,18 +74,21 @@ void test() {
 Internal Functions
  ************************************************************************ */
 
-/* Coin toss function:
- param: no parameters
- pre: no parameres
- post: output is a random intiger number in {0,1} */
+/* FLIP_SKIP_LINK
+ * Coin toss function:
+ * NO_PARAMS
+ * PRE: no parameres
+ * POST: output is a random intiger number in {0,1}
+ */
 int flipSkipLink(void) {
     return rand() % 2;
 }
 
-/* Move to the right as long as the next element is smaller than the input
- value: param: 	current -- pointer to a place in the list from where we
- need to slide to the right param:	e --  input value pre:	current is
- not NULL post: returns one link before the link that contains the input value e
+/* SLIDE_RIGHT_SKIP_LIST
+ * Move to the right as long as the next element is smaller than the input value
+ * CURRENT: pointer to a place in the list from where we need to slide to the right
+ * E:       input value PRE:	current is not NULL
+ * POST:    returns one link before the link that contains the input value e
  */
 struct skipLink *slideRightSkipList(struct skipLink *current, TYPE e) {
     while ((current->next != 0) && LT(current->next->value, e))
@@ -85,14 +96,15 @@ struct skipLink *slideRightSkipList(struct skipLink *current, TYPE e) {
     return current;
 }
 
-/* Create a new skip link for a value
-        param: e	 -- the value to create a link for
-        param: nextLnk	 -- the new link's next should point to nextLnk
-        param: downLnk -- the new link's down should point to downLnk
-        pre:	none
-        post:	a link to store the value */
-struct skipLink *newSkipLink(TYPE e, struct skipLink *nextLnk,
-                             struct skipLink *downLnk) {
+/* NEW_SKIP_LINK
+ * Create a new skip link for a value
+ * E:       the value to create a link for
+ * NEXTLNK: the new link's next should point to nextLnk
+ * DOWNLNK: the new link's down should point to downLnk
+ * PRE:     none
+ * POST:    a link to store the value
+ */
+struct skipLink *newSkipLink(TYPE e, struct skipLink *nextLnk, struct skipLink *downLnk) {
     struct skipLink *tmp = (struct skipLink *)malloc(sizeof(struct skipLink));
     assert(tmp != 0);
     tmp->value = e;
@@ -101,24 +113,36 @@ struct skipLink *newSkipLink(TYPE e, struct skipLink *nextLnk,
     return tmp;
 }
 
-/* *** TODO: LinkAdd *** */
-/* Add a new skip link recursively
- param: current -- pointer to a place in the list where the new element should
- be inserted param: e	 -- the value to create a link for pre:	current is
- not NULL post: a link to store the value */
+/* SKIP_LIST_ADD
+ * Add a new skip link recursively
+ * CURRENT: pointer to a place in the list where the new element should be inserted
+ * E:       the value to create a link for
+ * PRE:     current is not NULL
+ * POST:    a link to store the value
+ */
 struct skipLink *skipLinkAdd(struct skipLink *current, TYPE e) {
-    /* FIXME */
+    /* *** TODO: LinkAdd *** */
+    struct skipLink *newLink;
+    if (current->down == NULL) {
+        newLink = newSkipLink(e, current->next, NULL);
+        current->next = newLink;
+    } else {
+        newLink = newSkipLink(e, current->next, skipLinkAdd(slideRightSkipList(current->down, e), e));
+        current->next = newLink;
+    }
+    return newLink;
 }
 
 /* ************************************************************************
 Public Functions
  ************************************************************************ */
 
-/* Initialize skip list:
- param:  slst -- pointer to the skip list
- pre:	slst is not null
- post: the sentinels are allocated, the pointers are set, and the list size
- equals zero */
+/* INIT_SKIP_LIST
+ * Initialize skip list:
+ * SLST:    pointer to the skip list
+ * PRE:     slst is not null
+ * POST:    the sentinels are allocated, the pointers are set, and the list size equals zero
+ */
 void initSkipList(struct skipList *slst) {
     slst->size = 0;
     slst->topSentinel = (struct skipLink *)malloc(sizeof(struct skipLink));
@@ -127,11 +151,13 @@ void initSkipList(struct skipList *slst) {
     slst->topSentinel->down = NULL;
 }
 
-/* Checks if an element is in the skip list:
- param: slst -- pointer to the skip list
- param: e -- element to be checked
- pre:	slst is not null
- post: returns true or false  */
+/* CONTAINS_SKIP_LIST
+ * Checks if an element is in the skip list:
+ * SLST:    pointer to the skip list
+ * E:       element to be checked
+ * PRE:     slst is not null
+ * POST:    returns true or false
+ */
 int containsSkipList(struct skipList *slst, TYPE e) {
     struct skipLink *tmp = slst->topSentinel;
     while (tmp != 0) {                                   /* 2pts */
@@ -143,11 +169,13 @@ int containsSkipList(struct skipList *slst, TYPE e) {
     return 0;
 }
 
-/* Remove an element from the skip list:
- param: slst -- pointer to the skip list
- param: e -- element to be removed
- pre:	slst is not null
- post: the new element is removed from all internal sorted lists */
+/* REMOVE_SKIP_LIST
+ * Remove an element from the skip list
+ * SLST:    pointer to the skip list
+ * E:       element to be removed
+ * PRE:     slst is not null
+ * POST:    the new element is removed from all internal sorted lists
+ */
 void removeSkipList(struct skipList *slst, TYPE e) {
     struct skipLink *current, *tmp;
     current = slst->topSentinel; /* 1pts */
@@ -164,127 +192,83 @@ void removeSkipList(struct skipList *slst, TYPE e) {
     }
 }
 
-int recurseSkipList(struct skipLink *currNode, TYPE e, int depth) {
-    while (currNode->next->value <= e) {
-        currNode = currNode->next;
-    }
-
-    if (currNode->down != NULL) {
-        recurseSkipList(currNode->down, e, depth);
-    }
-
-    if (depth >= 1) {
-        skipLinkAdd(currNode, e);
-        depth -= 1;
-    }
-
-    return depth;
-}
-
-/* *** TODO: Add *** */
-/* Add a new element to the skip list:
- * param: slst -- pointer to the skip list
- * param: e -- element to be added
- * pre: slst is not null
- * post: e is added to the lowest list and randomly to higher-level lists
+/* ADD_SKIP_LIST
+ * Add a new element to the skip list
+ * SLST:    pointer to the skip list
+ * E:       element to be added
+ * PRE:     slst is not null
+ * POST:    e is added to the lowest list and randomly to higher-level lists
  */
 void addSkipList(struct skipList *slst, TYPE e) {
     assert(slst != NULL);
-    struct skipLink *currNode = slst->topSentinel;
-    int depth = 1;
+    struct skipLink *current = slideRightSkipList(slst->topSentinel->next, e);
 
-    while (flipSkipLink()) {
-        depth += 1;
+    while (flipSkipLink() && current->down != NULL) {
+        current = slideRightSkipList(current->down, e);
     }
 
-    recurseSkipList(currNode, e, depth);
+    skipLinkAdd(current, e);
 }
 
-/* Find the number of elements in the skip list:
- param: slst -- pointer to the skip list
- pre: slst is not null
- post: the number of elements */
+/* SIZE_SKIP_LIST
+ * Find the number of elements in the skip list:
+ * SLST:    pointer to the skip list
+ * PRE:     slst is not null
+ * POST:    the number of elements
+ */
 int sizeSkipList(struct skipList *slst) {
     return slst->size;
 }
 
-struct skipLink *linkedList(struct skipLink *node) {
+/* TO_LINKED_LIST
+ * Convert SkipList to LinkedList
+ * NODE:    pointer to the first node in skip list
+ * PRE:     slst is not null and slst is not empty
+ * POST:    the links in the skip list are printed breadth-first, top-down
+ */
+struct skipLink *toLinkedList(struct skipLink *node) {
     while (node->down != NULL) {
         node = node->down;
     }
     return node;
 }
 
-TYPE maxSkipList(struct skipLink *list) {
-    TYPE max = 0;
-    while (list != NULL) {
-        if (max < list->value) {
-            max = list->value;
-        }
-        list = list->next;
-    }
-
-    return max;
-}
-
-int widthType(TYPE num) {
-    int width = 1;
-    while (num / 10 > 0) {
-        width += 1;
-    }
-
-    return width;
-}
-
-void printSep(int max, int modifier) {
-    int i, count = max - modifier;
-    for (i = 0; i < count; i++) {
-        printf("%s", "-");
-    }
-}
-
-/* *** TODO: Print *** */
-/* Print the links in the skip list:
- * param: slst -- pointer to the skip list
- * pre: slst is not null and slst is not empty
- * post: the links in the skip list are printed breadth-first, top-down
+/* PRINT_SKIP_LIST
+ * Print the links in the skip list
+ * SLST:    pointer to the skip list
+ * PRE:     slst is not null and slst is not empty
+ * POST:    the links in the skip list are printed breadth-first, top-down
  */
 void printSkipList(struct skipList *slst) {
+    /* *** TODO: Print *** */
     assert(slst != NULL && slst->size > 0);
-    struct skipLink *firstNode = slst->topSentinel;
-    struct skipLink *currNode = firstNode;
-    TYPE max = maxSkipList(linkedList(firstNode));
-    int maxWidth = 2 + widthType(max);
-    int currWidth;
+    struct skipLink *sentinal = slst->topSentinel;
+    struct skipLink *currNode = sentinal;
 
-    while (firstNode != NULL) {
-        printf("%s", "|");
-        currWidth = 1;
-        printSep(maxWidth, currWidth);
+    while (sentinal != NULL) {
         while (currNode != NULL) {
-            printf("%f", currNode->value);
-            currWidth = widthType(currNode->value);
-            printSep(max, currWidth);
+            printf("%f\t", currNode->value);
             currNode = currNode->next;
         }
-        firstNode = firstNode->down;
+        sentinal = sentinal->down;
     }
 
     return;
 }
 
-/* Merge two skip lists:
- * param: slst1 -- pointer to the skip list 1.
- * param: slst2 -- pointer to the skip list 2.
- * pre: slst1 and slst2 != null, and skip list 1 and skip list 2 are not
- * post: slst1 points to the merger skip list, slst2 is null.
+/* MERGE_SKIP_LIST
+ * Merge two skip lists:
+ * SLST1:   pointer to the skip list 1.
+ * SLST2:   pointer to the skip list 2.
+ * PRE:     slst1 and slst2 != null, and skip list 1 and skip list 2 are not
+ * POST:    slst1 points to the merger skip list, slst2 is null.
  */
 void mergeSkipList(struct skipList *slst1, struct skipList *slst2) {
     assert((slst1 != NULL) && (slst2 != NULL));
-    struct skipLink *currNode = linkedList(slst2->topSentinel);
+    struct skipLink *currNode = toLinkedList(slst2->topSentinel);
 
     while (currNode->next != NULL) {
         addSkipList(slst1, currNode->value);
         currNode = currNode->next;
     }
-} /* end of the function */
+}
