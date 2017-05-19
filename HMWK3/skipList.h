@@ -21,31 +21,31 @@
 #define LT(a, b) (a < b)
 #endif
 
-struct skipLink{
-	TYPE value;
-	struct skipLink * next;
-	struct skipLink * down;
-};
+typedef struct skipLink {
+    TYPE value;
+    struct skipLink *next;
+    struct skipLink *down;
+} skipLink;
 
-struct skipList{
-	struct skipLink * topSentinel;
-	int size;
-};
+typedef struct {
+    struct skipLink *topSentinel;
+    int size;
+} skipList;
 
 /* the public interface */
 void test(void);
-void initSkipList(struct skipList *slst);
-int containsSkipList(struct skipList *slst, TYPE e);
-void removeSkipList(struct skipList *slst, TYPE e);
-void addSkipList(struct skipList *slst, TYPE e);
-int sizeSkipList(struct skipList *slst);
-void printSkipList(struct skipList *slst);
-void mergeSkipList(struct skipList *slst1, struct skipList *slst2);
+void initSkipList(skipList *slst);
+int containsSkipList(skipList *slst, TYPE e);
+void removeSkipList(skipList *slst, TYPE e);
+void addSkipList(skipList *slst, TYPE e);
+int sizeSkipList(skipList *slst);
+void printSkipList(skipList *slst);
+void mergeSkipList(skipList *slst1, skipList *slst2);
 
 /* internal routines */
 int flipSkipLink();
-struct skipLink * slideRightSkipList(struct skipLink * current, TYPE e);
-struct skipLink * skipLinkAdd(struct skipLink * current, TYPE e);
-struct skipLink * newSkipLink(TYPE e, struct skipLink * nextLnk, struct skipLink* downLnk);
+skipLink *slideRightSkipList(skipLink *current, TYPE e);
+skipLink *skipLinkAdd(skipLink *current, TYPE e);
+skipLink *newSkipLink(TYPE e, skipLink *nextLnk, skipLink *downLnk);
 
 #endif /* SKIPLIST_H_ */
